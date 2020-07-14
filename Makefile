@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -Wall
-LDFLAGS = -lSDL2
+LDFLAGS = -lSDL2 -lSDL2_image
 
 ifeq ($(DEBUG), yes)
 	CFLAGS += -g
