@@ -3,11 +3,11 @@
 
 cCharacter::cCharacter(SDL_Window *window, SDL_Renderer *renderer)
 {
-    m_x = 380;
-    m_y = 280;
+    m_x = 320;
+    m_y = 90;
 
     m_currentState = IDLE;
-    m_currnetFrame = 0;
+    m_currentFrame = 0;
     m_faceDirection = DOWN;
 
     m_mainSpriteSheet.loadFromFile(window, renderer, "spriteSheet.jpeg");
@@ -33,7 +33,7 @@ void cCharacter::render(SDL_Renderer *renderer)
 
     if(m_currentState == WALKING)
     {
-        switch(m_currnetFrame / 10)
+        switch(m_currentFrame / 10)
         {
             case 0: renderQuad.x = m_mainSpriteSheet.get_width() / 4 * 0; break;
             case 1: renderQuad.x = m_mainSpriteSheet.get_width() / 4 * 1; break;
@@ -45,16 +45,58 @@ void cCharacter::render(SDL_Renderer *renderer)
     m_mainSpriteSheet.render(renderer, m_x, m_y, &renderQuad);
 }
 
+void cCharacter::handleEvent(SDL_Event &e)
+{
+    switch(e.type)
+    {
+        case SDL_KEYDOWN:
+            switch(e.key.keysym.sym)
+            {
+                case SDLK_UP:    m_faceDirection = UP;    break;
+                case SDLK_DOWN:  m_faceDirection = DOWN;  break;
+                case SDLK_LEFT:  m_faceDirection = LEFT;  break;
+                case SDLK_RIGHT: m_faceDirection = RIGHT; break;
+            }
+
+            if(m_currentState != WALKING)
+                m_currentFrame = 10;
+
+            m_currentState = WALKING;
+            break;
+
+        case SDL_KEYUP:
+            m_currentState = IDLE;
+            break;
+    }
+}
+
+void cCharacter::move()
+{
+    if(m_currentState == WALKING)
+    {
+        switch(m_faceDirection)
+        {
+            case UP:    m_y -= 2; break;
+            case DOWN:  m_y += 2; break;
+            case LEFT:  m_x -= 2; break;
+            case RIGHT: m_x += 2; break;
+        }
+    }
+}
+
 void cCharacter::nextFrame()
 {
     switch(m_currentState)
     {
         case IDLE:
-            m_currnetFrame = 0;
+            m_currentFrame = 0;
             break;
         
         case WALKING:
-            m_currnetFrame++;
+            m_currentFrame++;
+
+            if(m_currentFrame / 10 > 3)
+                m_currentFrame = 0;
             break;
     }
 }

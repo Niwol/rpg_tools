@@ -28,6 +28,8 @@ class cCharacter
         ~cCharacter();
 
         void render(SDL_Renderer *renderer);
+        void handleEvent(SDL_Event &e);
+        void move();
         void nextFrame();
 
     private:
@@ -35,7 +37,7 @@ class cCharacter
     int m_x, m_y;
 
     int m_currentState;
-    int m_currnetFrame;
+    int m_currentFrame;
     int m_faceDirection;
 
     cTexture m_mainSpriteSheet;

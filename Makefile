@@ -12,7 +12,6 @@ EXEC = bin/main
 SRC = $(wildcard src/*.cpp)
 OBJ = $(subst src,obj, $(SRC:.cpp=.o))
 
-
 obj/%.o: src/%.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
 

@@ -40,6 +40,7 @@ int main()
 
         while(!quit)
         {
+            // Events
             while(SDL_PollEvent(&e))
             {
                 if(e.type == SDL_QUIT)
@@ -55,7 +56,11 @@ int main()
                         case SDLK_RIGHT: clip.y =  texture.get_height() / 4 * 2;  break;
                     }
                 }
+
+                character.handleEvent(e);
             }
+
+            character.move();
 
 
             // Rendering
