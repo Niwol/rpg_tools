@@ -6,11 +6,16 @@ cCharacter::cCharacter(SDL_Window *window, SDL_Renderer *renderer)
     m_x = 320;
     m_y = 90;
 
+    m_speed = 2.0f;
+
     m_currentState = IDLE;
     m_currentFrame = 0;
     m_faceDirection = DOWN;
 
-    m_mainSpriteSheet.loadFromFile(window, renderer, "spriteSheet.jpeg");
+    for(int i = 0; i < 5; i++)
+        m_keyHeld[i] = false;
+
+    m_mainSpriteSheet.loadFromFile(window, renderer, "spriteSheet.png", true);
 }
 
 cCharacter::~cCharacter()
@@ -52,22 +57,78 @@ void cCharacter::handleEvent(SDL_Event &e)
         case SDL_KEYDOWN:
             switch(e.key.keysym.sym)
             {
-                case SDLK_UP:    m_faceDirection = UP;    break;
-                case SDLK_DOWN:  m_faceDirection = DOWN;  break;
-                case SDLK_LEFT:  m_faceDirection = LEFT;  break;
-                case SDLK_RIGHT: m_faceDirection = RIGHT; break;
+                case SDLK_z:
+                    if(!m_keyHeld[UP])
+                    {
+                        m_keyHeld[UP] = true;
+                        m_faceDirection = UP;
+                    }
+                    break;
+
+                case SDLK_s:
+                    if(!m_keyHeld[DOWN])
+                    {
+                        m_keyHeld[DOWN] = true;
+                        m_faceDirection = DOWN;
+                    }
+                    break;
+
+                case SDLK_q:
+                    if(!m_keyHeld[LEFT])
+                    {
+                        m_keyHeld[LEFT] = true;
+                        m_faceDirection = LEFT;
+                    }
+                    break;
+
+                case SDLK_d: 
+                    if(!m_keyHeld[RIGHT])
+                    {
+                        m_keyHeld[RIGHT] = true;
+                        m_faceDirection = RIGHT;
+                    }
+                    break;
             }
 
-            if(m_currentState != WALKING)
-                m_currentFrame = 10;
+            switch(e.key.keysym.sym)
+            {
+                case SDLK_z:
+                case SDLK_s: 
+                case SDLK_q:
+                case SDLK_d:
+                    if(m_currentState != WALKING)
+                        m_currentFrame = 10;
 
-            m_currentState = WALKING;
+                    m_currentState = WALKING;
+            }
             break;
 
         case SDL_KEYUP:
-            m_currentState = IDLE;
+            switch(e.key.keysym.sym)
+            { 
+                case SDLK_z: m_keyHeld[UP]    = false; break;
+                case SDLK_s: m_keyHeld[DOWN]  = false; break;
+                case SDLK_q: m_keyHeld[LEFT]  = false; break;
+                case SDLK_d: m_keyHeld[RIGHT] = false; break;
+            }
             break;
     }
+
+    if(m_keyHeld[UP] || m_keyHeld[DOWN] || m_keyHeld[LEFT] || m_keyHeld[RIGHT])
+    {
+        if((m_faceDirection == UP    && !m_keyHeld[UP])   ||
+           (m_faceDirection == DOWN  && !m_keyHeld[DOWN]) ||
+           (m_faceDirection == LEFT  && !m_keyHeld[LEFT]) ||
+           (m_faceDirection == RIGHT && !m_keyHeld[RIGHT])
+          )
+        {
+            int i = 4;
+            while(!m_keyHeld[i] && i > 0) i--;
+            m_faceDirection = i;
+        }
+    }
+    else
+        m_currentState = IDLE;
 }
 
 void cCharacter::move()
@@ -76,10 +137,10 @@ void cCharacter::move()
     {
         switch(m_faceDirection)
         {
-            case UP:    m_y -= 2; break;
-            case DOWN:  m_y += 2; break;
-            case LEFT:  m_x -= 2; break;
-            case RIGHT: m_x += 2; break;
+            case UP:    m_y -= m_speed; break;
+            case DOWN:  m_y += m_speed; break;
+            case LEFT:  m_x -= m_speed; break;
+            case RIGHT: m_x += m_speed; break;
         }
     }
 }

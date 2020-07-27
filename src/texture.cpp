@@ -27,11 +27,12 @@ void cTexture::free()
 
 
 
-bool cTexture::loadFromFile(SDL_Window *window, SDL_Renderer *renderer, std::string path)
+bool cTexture::loadFromFile(SDL_Window *window, SDL_Renderer *renderer, std::string path, bool alpha)
 {
     free();
 
     SDL_Texture *newTexture = NULL;
+    Uint32 format = alpha ? SDL_PIXELFORMAT_ARGB32 : SDL_GetWindowPixelFormat(window);
 
     // Load surface
     SDL_Surface *loadedSurface = IMG_Load(path.c_str());
@@ -41,8 +42,9 @@ bool cTexture::loadFromFile(SDL_Window *window, SDL_Renderer *renderer, std::str
         return false;
     }
 
+
     // Convert to display format
-    SDL_Surface *formatedSurface = SDL_ConvertSurfaceFormat(loadedSurface, SDL_GetWindowPixelFormat(window), 0);
+    SDL_Surface *formatedSurface = SDL_ConvertSurfaceFormat(loadedSurface, format, 0);
     if(formatedSurface == NULL)
     {
         printf("Could not convert surface to display format! SDL_ERROR: %s\n", SDL_GetError());
@@ -53,7 +55,7 @@ bool cTexture::loadFromFile(SDL_Window *window, SDL_Renderer *renderer, std::str
     }
 
     // Create blank texture
-    newTexture = SDL_CreateTexture(renderer, SDL_GetWindowPixelFormat(window), SDL_TEXTUREACCESS_STREAMING, formatedSurface->w, formatedSurface->h);
+    newTexture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, formatedSurface->w, formatedSurface->h);
     if(newTexture == NULL)
     {
         printf("Could not create blank texture! SDL_ERROR: %s\n", SDL_GetError());
@@ -69,6 +71,9 @@ bool cTexture::loadFromFile(SDL_Window *window, SDL_Renderer *renderer, std::str
     memcpy(m_pixels, formatedSurface->pixels, formatedSurface->pitch * formatedSurface->h);
     SDL_UnlockTexture(newTexture);
     m_pixels = NULL;
+
+    if(alpha)
+        SDL_SetTextureBlendMode(newTexture, SDL_BLENDMODE_BLEND);
 
     m_width = formatedSurface->w;
     m_height = formatedSurface->h;
@@ -89,7 +94,7 @@ void cTexture::render(SDL_Renderer *renderer, int x, int y, SDL_Rect *clip)
         renderQuad.w = clip->w;
         renderQuad.h = clip->h;
     }
-
+    
     SDL_RenderCopy(renderer, m_texture, clip, &renderQuad);
 }
 

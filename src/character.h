@@ -14,10 +14,11 @@ enum stats
 
 enum faceDirection
 {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT
+    NO_DIRECTION = 0,
+    UP           = 1,
+    DOWN         = 2,
+    LEFT         = 3,
+    RIGHT        = 4
 };
 
 class cCharacter
@@ -34,11 +35,14 @@ class cCharacter
 
     private:
 
-    int m_x, m_y;
+    float m_x, m_y;
+    float m_speed;
 
     int m_currentState;
     int m_currentFrame;
     int m_faceDirection;
+
+    bool m_keyHeld[5];
 
     cTexture m_mainSpriteSheet;
 };

@@ -17,7 +17,7 @@ class cTexture
         void free();
 
         // Methods
-        bool loadFromFile(SDL_Window *window, SDL_Renderer *renderer, std::string path);
+        bool loadFromFile(SDL_Window *window, SDL_Renderer *renderer, std::string path, bool alpha = false);
         void render(SDL_Renderer *renderer, int x, int y, SDL_Rect *clip = NULL);
 
         bool lockTexture();
